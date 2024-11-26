@@ -1,0 +1,6 @@
+spring:
+  profiles:
+    group:
+      local: local, datasource, redis
+      dev: dev, datasource, redis
+    default: local

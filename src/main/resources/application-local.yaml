@@ -1,0 +1,15 @@
+spring:
+  sql:
+    init:
+      mode: never
+  config:
+    activate:
+      on-profile: local
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true      # 쿼리 로그 포맷 (정렬)
+        show_sql: true        # 쿼리 로그 출력
+    #    defer-datasource-initialization: true # ddl-auto 옵션 실행 후 script가 실행되도록 설정
