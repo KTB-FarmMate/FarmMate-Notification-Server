@@ -7,14 +7,17 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.farmmate.notification.crop.repository.CropRepository;
 import com.farmmate.notification.infra.redis.listner.RedisMessageListener;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class RedisConfig {
 	private final CropRepository cropRepository;
 
@@ -25,6 +28,7 @@ public class RedisConfig {
 
 		container.setConnectionFactory(connectionFactory);
 		cropRepository.findAll().forEach(crop -> {
+			System.out.println("crop.getName() = " + crop.getName());
 			container.addMessageListener(listenerAdapter, new ChannelTopic(crop.getName()));
 		});
 
@@ -33,13 +37,17 @@ public class RedisConfig {
 
 	@Bean
 	public MessageListenerAdapter listenerAdapter(RedisMessageListener listener) {
-		return new MessageListenerAdapter(listener);
+		return new MessageListenerAdapter(listener, "handleMessage");
 	}
 
 	@Bean
 	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
 		RedisTemplate<String, Object> template = new RedisTemplate<>();
 		template.setConnectionFactory(connectionFactory);
+
+		template.setKeySerializer(new StringRedisSerializer());
+		template.setValueSerializer(new StringRedisSerializer());
+		template.setDefaultSerializer(new StringRedisSerializer());
 
 		return template;
 	}
