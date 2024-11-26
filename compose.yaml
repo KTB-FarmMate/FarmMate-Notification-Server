@@ -1,14 +1,47 @@
 services:
   mysql:
+    #container_name: 'local-mysql'
     image: 'mysql:latest'
     environment:
       - 'MYSQL_DATABASE=mydatabase'
       - 'MYSQL_PASSWORD=secret'
       - 'MYSQL_ROOT_PASSWORD=verysecret'
       - 'MYSQL_USER=myuser'
+    volumes:
+      - './src/main/resources/db:/docker-entrypoint-initdb.d'
     ports:
-      - '3306'
+      - '3306:3306'
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+
+
   redis:
+    #container_name: 'local-redis'
     image: 'redis:latest'
     ports:
-      - '6379'
+      - '6379:6379'
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+
+#  spring:
+#    #container_name: 'local-app'
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    ports:
+#      - '8080:8080'
+#    env_file:
+#      - '.local.env'
+#    depends_on:
+#      mysql:
+#        condition: service_healthy
+#      redis:
+#        condition: service_healthy
+#    volumes:
+#      - './logs:/app/logs'
